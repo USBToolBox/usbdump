@@ -1549,9 +1549,11 @@ PWCHAR GetRootHubName (
 {
     BOOL                success = 0;
     ULONG               nBytes = 0;
+    ULONG               actualBytes = 0;
     USB_ROOT_HUB_NAME   rootHubName;
     PUSB_ROOT_HUB_NAME  rootHubNameW = NULL;
     // PCHAR               rootHubNameA = NULL;
+    PWCHAR              rootHubNameCopy = NULL;
 
     // Get the length of the name of the Root Hub attached to the
     // Host Controller
@@ -1574,6 +1576,7 @@ PWCHAR GetRootHubName (
     // Allocate space to hold the Root Hub name
     //
     nBytes = rootHubName.ActualLength;
+    actualBytes = nBytes - sizeof(ULONG);
 
     rootHubNameW = (PUSB_ROOT_HUB_NAME)ALLOC(nBytes);
     if (rootHubNameW == NULL)
@@ -1598,9 +1601,20 @@ PWCHAR GetRootHubName (
         goto GetRootHubNameError;
     }
 
+    rootHubNameCopy = (PWCHAR)ALLOC(actualBytes);
+    if (rootHubNameCopy == NULL)
+    {
+        OOPS();
+        goto GetRootHubNameError;
+    }
+    StringCchCopyN(rootHubNameCopy, actualBytes,
+        rootHubNameW->RootHubName, actualBytes);
+
+    FREE(rootHubNameW);
+
     // Convert the Root Hub name
     //
-    return rootHubNameW->RootHubName;
+    return rootHubNameCopy;
 
 GetRootHubNameError:
     // There was an error, free anything that was allocated
