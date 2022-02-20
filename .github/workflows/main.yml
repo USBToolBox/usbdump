@@ -7,10 +7,6 @@ on:
     types: [published]
   workflow_dispatch:
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
-
 jobs:
   build:
     # The CMake configure and build commands are platform agnostic and should work equally
@@ -19,27 +15,35 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: windows-latest
 
+    strategy:
+      matrix:
+        build-type: [Release, Debug]
+        target: [win32, x64]
+
     steps:
     - uses: actions/checkout@v2
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -G "Visual Studio 17 2022" -T host=x64 -A win32
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G "Visual Studio 17 2022" -T host=x64 -A ${{ matrix.target }}
 
     - name: Build
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build --config ${{ matrix.build-type }}
+    - name: Rename Binary
+      # upload-release-action doesn't let you change the filename, so we'll just do it here
+      run: move build/bin/${{ matrix.build-type }}/usbdump.exe build/bin/${{ matrix.build-type }}/usbdump-${{ matrix.build-type }}-${{ matrix.target }}.exe
     - name: Upload to Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: Release
-        path: build/bin/${{env.BUILD_TYPE}}/usbdump.exe
+        name: ${{ matrix.build-type }} ${{ matrix.target }}
+        path: build/bin/${{ matrix.build-type }}/usbdump-${{ matrix.build-type }}-${{ matrix.target }}.exe
     - name: Upload to Release
       if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: build/bin/${{env.BUILD_TYPE}}/usbdump.exe
+        file: build/bin/${{ matrix.build-type }}/usbdump-${{ matrix.build-type }}-${{ matrix.target }}.exe
         tag: ${{ github.ref }}
         file_glob: true
