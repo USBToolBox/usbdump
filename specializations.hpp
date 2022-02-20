@@ -492,6 +492,7 @@ namespace nlohmann {
             ADD_JSON_ENTRY_SAFE(DeviceInfoNode)
             ADD_JSON_ENTRY_SAFE_VERBOSE(HubCapabilityEx)
             ADD_JSON_ENTRY_SAFE(ConnectionInfo)
+            ADD_JSON_ENTRY_SAFE_WIDE(DriverKey)
             ADD_JSON_ENTRY_SAFE_VERBOSE(ConfigDesc)
             ADD_JSON_ENTRY_SAFE_VERBOSE(BosDesc)
             ADD_JSON_ENTRY_SAFE(StringDescs)

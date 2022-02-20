@@ -21,7 +21,7 @@
 #include "specializations.hpp"
 #include "nlohmann/json.hpp"
 
-#define TOOL_VERSION "0.1.0"
+#define TOOL_VERSION "0.1.1"
 
 
 #define QUICKCOUT(...) std::cout << __VA_ARGS__ << std::endl

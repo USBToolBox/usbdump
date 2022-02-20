@@ -1041,6 +1041,7 @@ EnumerateHubPorts (
         connectionInfoExV2 = NULL;
         pNode = NULL;
         DevProps = NULL;
+        driverKeyName = NULL;
         ZeroMemory(leafName, sizeof(leafName));
 
         //
@@ -1276,7 +1277,7 @@ EnumerateHubPorts (
                     DevProps = DriverNameToDeviceProperties(driverKeyName, cbDriverName);
                     pNode = FindMatchingDeviceNodeForDriverName(driverKeyName, connectionInfoEx->DeviceIsHub);
                 }
-                FREE(driverKeyName);
+                // FREE(driverKeyName);
             }
 
         }
@@ -1386,6 +1387,7 @@ EnumerateHubPorts (
 
             info->DeviceInfoType = DeviceInfo;
             info->ConnectionInfo = connectionInfoEx;
+            info->DriverKey = driverKeyName;
             info->PortConnectorProps = pPortConnectorProps;
             info->ConfigDesc = configDesc;
             info->StringDescs = stringDescs;

@@ -305,6 +305,7 @@ typedef struct _USBROOTHUBINFO
 typedef struct _USBEXTERNALHUBINFO : public _USBROOTHUBINFO
 {
     PUSB_NODE_CONNECTION_INFORMATION_EX    ConnectionInfo;
+    PWCHAR                                 DriverKey;
     PUSB_DESCRIPTOR_REQUEST                ConfigDesc;
     PUSB_DESCRIPTOR_REQUEST                BosDesc;
     PSTRING_DESCRIPTOR_NODE                StringDescs;
