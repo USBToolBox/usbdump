@@ -65,6 +65,7 @@ Revision History:
 //*****************************************************************************
 
 #include "uvcview.h"
+#include "utils.hpp"
 
 //*****************************************************************************
 // D E F I N E S
@@ -218,11 +219,8 @@ FindMatchingDeviceNodeForDriverName(
 
 // List of enumerated host controllers.
 //
-LIST_ENTRY EnumeratedHCListHead =
-{
-    &EnumeratedHCListHead,
-    &EnumeratedHCListHead
-};
+
+std::vector<PUSBHOSTCONTROLLERINFO> EnumeratedHCList;
 
 DEVICE_GUID_LIST gHubList;
 DEVICE_GUID_LIST gDeviceList;
@@ -348,7 +346,9 @@ EnumerateHostControllers (
                                     deviceDetailData->DevicePath,
                                     deviceInfo,
                                     &deviceInfoData);
-            hostControllers.push_back(info);
+            if (info) {
+                hostControllers.push_back(info);
+            }
 
             CloseHandle(hHCDev);
         }
@@ -359,7 +359,7 @@ EnumerateHostControllers (
     SetupDiDestroyDeviceInfoList(deviceInfo);
 
     *DevicesConnected = TotalDevicesConnected;
-    
+
     return hostControllers;
 }
 
@@ -383,9 +383,7 @@ EnumerateHostController (
     PWCHAR                   driverKeyName = NULL;
     HTREEITEM               hHCItem = NULL;
     PWCHAR                   rootHubName = NULL;
-    PLIST_ENTRY             listEntry = NULL;
     PUSBHOSTCONTROLLERINFO  hcInfo = NULL;
-    PUSBHOSTCONTROLLERINFO  hcInfoInList = NULL;
     DWORD                   dwSuccess;
     BOOL                    success = FALSE;
     ULONG                   deviceAndFunction = 0;
@@ -417,16 +415,9 @@ EnumerateHostController (
     // Don't enumerate this host controller again if it already
     // on the list of enumerated host controllers.
     //
-    listEntry = EnumeratedHCListHead.Flink;
-
-    if (!listEntry) return NULL;
-    while (listEntry != &EnumeratedHCListHead)
+    for (PUSBHOSTCONTROLLERINFO hcInfoInList : EnumeratedHCList)
     {
-        hcInfoInList = CONTAINING_RECORD(listEntry,
-                                         USBHOSTCONTROLLERINFO,
-                                         ListEntry);
-
-        if (hcInfoInList && wcscmp(driverKeyName, hcInfoInList->DriverKey) == 0)
+        if (wcscmp(driverKeyName, hcInfoInList->DriverKey) == 0)
         {
             // Already on the list, exit
             //
@@ -434,8 +425,6 @@ EnumerateHostController (
             FREE(hcInfo);
             return NULL;
         }
-
-        listEntry = listEntry->Flink;
     }
 
     // Obtain host controller device properties
@@ -554,8 +543,7 @@ EnumerateHostController (
     // Add this host controller to the list of enumerated
     // host controllers.
     //
-    InsertTailList(&EnumeratedHCListHead,
-                   &hcInfo->ListEntry);
+    EnumeratedHCList.push_back(hcInfo);
 
     // Get the name of the root hub for this host
     // controller and then enumerate the root hub.
@@ -1826,7 +1814,7 @@ PWCHAR GetHCDDriverKeyName (
     ULONG                   nBytes = 0;
     USB_HCD_DRIVERKEY_NAME  driverKeyName = {0};
     PUSB_HCD_DRIVERKEY_NAME driverKeyNameW = NULL;
-    // PWCHAR pWideStr = NULL;
+    PWCHAR pWideStr = NULL;
 
     ZeroMemory(&driverKeyName, sizeof(driverKeyName));
 
@@ -1888,19 +1876,19 @@ PWCHAR GetHCDDriverKeyName (
 
 
     // Use local string to guarantee zero termination
-    // pWideStr = (PWCHAR) ALLOC((DWORD) nBytes - sizeof(USB_HCD_DRIVERKEY_NAME) + sizeof(WCHAR) + sizeof(WCHAR));
-    // if (NULL == pWideStr)
-    // {
-    //     return NULL;
-    // }
-    // memset(pWideStr, 0, nBytes - sizeof(USB_HCD_DRIVERKEY_NAME) + sizeof(WCHAR) + sizeof(WCHAR));
-    // memcpy(pWideStr, driverKeyNameW->DriverKeyName, nBytes - sizeof(USB_HCD_DRIVERKEY_NAME) + sizeof(WCHAR));
+    pWideStr = (PWCHAR) ALLOC((DWORD) nBytes - sizeof(USB_HCD_DRIVERKEY_NAME) + sizeof(WCHAR) + sizeof(WCHAR));
+    if (NULL == pWideStr)
+    {
+        return NULL;
+    }
+    memset(pWideStr, 0, nBytes - sizeof(USB_HCD_DRIVERKEY_NAME) + sizeof(WCHAR) + sizeof(WCHAR));
+    memcpy(pWideStr, driverKeyNameW->DriverKeyName, nBytes - sizeof(USB_HCD_DRIVERKEY_NAME) + sizeof(WCHAR));
 // 
-    // FREE(driverKeyNameW);
+    FREE(driverKeyNameW);
 // 
-    // return pWideStr;
+    return pWideStr;
 
-    return driverKeyNameW->DriverKeyName;
+    // return driverKeyNameW->DriverKeyName;
 
 GetHCDDriverKeyNameError:
     // There was an error, free anything that was allocated

@@ -19,9 +19,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
 
-FetchContent_Declare(json
- GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
-  GIT_TAG v3.9.1)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_MakeAvailable(json)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_compile_options(/ZH:SHA_256 /W4 /permissive- /Zc:__cplusplus)
@@ -39,15 +38,9 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
         add_compile_options(-O3 -fsanitize=undefined,address)
         add_link_options(-fsanitize=undefined,address)
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        add_compile_options(-O3 -fsanitize=undefined,address -fsanitize-blacklist=C:/Users/dhina/Documents/GitHub/Win32Testv2/fsanitize-blacklist.txt)
-        add_link_options(-fsanitize=undefined,address -fsanitize-blacklist=C:/Users/dhina/Documents/GitHub/Win32Testv2/fsanitize-blacklist.txt)
+        add_compile_options(-O3 -fsanitize=undefined,address -fsanitize-blacklist=C:/Users/dhina/Documents/GitHub/usbdump/fsanitize-blacklist.txt)
+        add_link_options(-fsanitize=undefined,address -fsanitize-blacklist=C:/Users/dhina/Documents/GitHub/usbdump/fsanitize-blacklist.txt)
     endif()
-endif()
-
-FetchContent_GetProperties(json)
-if(NOT json_POPULATED)
-  FetchContent_Populate(json)
- add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
 add_compile_definitions(UNICODE)
