@@ -3,6 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.16)
 cmake_policy(SET CMP0091 NEW)
+cmake_policy(SET CMP0149 NEW)
 project ("usbdump" LANGUAGES C CXX VERSION 0.1)
 include(FetchContent)
 
