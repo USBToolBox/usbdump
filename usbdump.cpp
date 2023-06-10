@@ -1,7 +1,7 @@
-﻿// Win32Test.cpp : Defines the entry point for the application.
+﻿// usbdump.cpp : Defines the entry point for the application.
 //
 
-#include "Win32Test.h"
+#include "usbdump.h"
 
 using namespace std;
 using json = nlohmann::json;
@@ -16,7 +16,8 @@ void initGlobals() {
 int main(int argc, char* argv[]) {
     if (argc >= 2) {
         if (std::string(argv[1]) == "--version" || std::string(argv[1]) == "-v") {
-            std::cout << TOOL_VERSION << std::endl;
+            std::cout << "usbdump " TOOL_VERSION << std::endl;
+            std::cout << "Built on " __DATE__ " " __TIME__ << std::endl;
             return 0;
         } else {
             return 1;
