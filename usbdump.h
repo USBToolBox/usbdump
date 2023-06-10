@@ -1,4 +1,4 @@
-﻿// Win32Test.h : Include file for standard system include files,
+﻿// usbdump.h : Include file for standard system include files,
 // or project specific include files.
 
 #pragma once
@@ -21,7 +21,7 @@
 #include "specializations.hpp"
 #include "nlohmann/json.hpp"
 
-#define TOOL_VERSION "0.1.1"
+#define TOOL_VERSION "0.2"
 
 
 #define QUICKCOUT(...) std::cout << __VA_ARGS__ << std::endl

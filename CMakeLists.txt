@@ -1,9 +1,9 @@
-﻿# CMakeList.txt : CMake project for Win32Test, include source and define
+﻿# CMakeList.txt : CMake project for usbdump, include source and define
 # project specific logic here.
 #
 cmake_minimum_required (VERSION 3.16)
 cmake_policy(SET CMP0091 NEW)
-project ("Win32Test" LANGUAGES C CXX VERSION 0.1)
+project ("usbdump" LANGUAGES C CXX VERSION 0.1)
 include(FetchContent)
 
 # find static libraries (so MT can work ??)
@@ -46,7 +46,7 @@ endif()
 add_compile_definitions(UNICODE)
 
 # Add source to this project's executable.
-add_executable (usbdump "Win32Test.cpp" "enum.cpp" "devnode.cpp" "Win32Test.h" "usbdesc.h" "uvcdesc.h" "uvcview.h")
+add_executable (usbdump "usbdump.cpp" "enum.cpp" "devnode.cpp" "usbdump.h" "usbdesc.h" "uvcdesc.h" "uvcview.h")
 set_property(TARGET usbdump PROPERTY
                 MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 

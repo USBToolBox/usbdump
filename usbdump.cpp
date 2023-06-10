@@ -1,7 +1,7 @@
-﻿// Win32Test.cpp : Defines the entry point for the application.
+﻿// usbdump.cpp : Defines the entry point for the application.
 //
 
-#include "Win32Test.h"
+#include "usbdump.h"
 
 using namespace std;
 using json = nlohmann::json;
